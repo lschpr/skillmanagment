@@ -8,7 +8,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 /**
- * @extends Factory<User>
+ * Met deze factory kan ik heel makkelijk 1 of meer test users aanmaken. 
+ * Ideaal om mijn database even snel te vullen.
  */
 class UserFactory extends Factory
 {
@@ -18,9 +19,7 @@ class UserFactory extends Factory
     protected static ?string $password;
 
     /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
+     * De standaard waarden voor een nieuwe user.
      */
     public function definition(): array
     {
@@ -29,6 +28,8 @@ class UserFactory extends Factory
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
+            'role' => fake()->randomElement(['student', 'company']), // Admin maak ik meestal handmatig aan.
+            'status' => 'active',
             'remember_token' => Str::random(10),
         ];
     }

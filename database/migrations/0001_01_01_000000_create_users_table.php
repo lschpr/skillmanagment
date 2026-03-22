@@ -4,23 +4,35 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+/**
+ * Hier maak ik mijn 'users' tabel aan. 
+ * Dit is de basis voor iedereen die op het platform komt.
+ */
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * De 'up' methode bouwt de tabellen in mijn database.
      */
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('email')->unique();
+            $table->string('email')->unique(); // Email moet uniek zijn voor het inloggen.
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            
+            // Ik heb hier rollen toegevoegd voor studenten, bedrijven en de admin.
+            $table->string('role')->default('student'); 
+            
+            // Status om te kijken of de admin iemand geblokkeerd heeft.
+            $table->string('status')->default('active'); 
+            
             $table->rememberToken();
-            $table->timestamps();
+            $table->timestamps(); // Dit maakt 'created_at' en 'updated_at' aan.
         });
 
+        // Standaard Laravel tabellen voor password reset en sessies.
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();
             $table->string('token');
@@ -38,7 +50,7 @@ return new class extends Migration
     }
 
     /**
-     * Reverse the migrations.
+     * De 'down' methode verwijdert de tabellen weer bij een rollback.
      */
     public function down(): void
     {
