@@ -9,22 +9,23 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
+/**
+ * Deze mailable verstuur ik naar de student wanneer de status 
+ * van zijn/haar sollicitatie is aangepast door een bedrijf.
+ */
 class ApplicationStatusUpdated extends Mailable
 {
     use Queueable, SerializesModels;
 
     public $application;
 
-    /**
-     * Create a new message instance.
-     */
     public function __construct(Application $application)
     {
         $this->application = $application;
     }
 
     /**
-     * Get the message envelope.
+     * Het onderwerp van de mail bevat de titel van de opdracht.
      */
     public function envelope(): Envelope
     {
@@ -34,7 +35,7 @@ class ApplicationStatusUpdated extends Mailable
     }
 
     /**
-     * Get the message content definition.
+     * De inhoud wordt gerenderd vanuit de 'emails.application-status-updated' view.
      */
     public function content(): Content
     {

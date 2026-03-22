@@ -33,6 +33,7 @@ class NewMessageReceived extends Mailable
 
     /**
      * De 'Envelope' bevat zaken zoals het onderwerp en de afzender.
+     * Ik gebruik hier de naam van de afzender in het onderwerp voor de herkenbaarheid.
      */
     public function envelope(): Envelope
     {

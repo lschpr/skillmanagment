@@ -1,3 +1,7 @@
+{{-- 
+    Ik gebruik hier @if/@else om de inhoud van de mail aan te passen 
+    op basis van de status (geaccepteerd of afgewezen).
+--}}
 <x-mail::message>
 # Status update van je sollicitatie
 

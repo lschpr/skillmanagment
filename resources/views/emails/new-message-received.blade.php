@@ -1,3 +1,7 @@
+{{-- 
+    Dit is de e-mail template voor nieuwe chatberichten.
+    Ik gebruik 'Str::limit' om een voorproefje van het bericht te tonen.
+--}}
 <x-mail::message>
 # Je hebt een nieuw bericht ontvangen
 
