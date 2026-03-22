@@ -9,14 +9,19 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
+/**
+ * Deze 'Mailable' klas gebruik ik om een e-mail te sturen naar het bedrijf
+ * wanneer een student heeft gereageerd op een opdracht.
+ */
 class ApplicationReceived extends Mailable
 {
     use Queueable, SerializesModels;
 
+    // Deze variabele is publiek zodat ik hem direct in de e-mail template kan gebruiken.
     public $application;
 
     /**
-     * Create a new message instance.
+     * Bij het aanmaken van de mail geef ik de 'Application' mee vanuit de Controller.
      */
     public function __construct(Application $application)
     {
@@ -24,7 +29,7 @@ class ApplicationReceived extends Mailable
     }
 
     /**
-     * Get the message envelope.
+     * Hier definieer ik het onderwerp (subject) van de e-mail.
      */
     public function envelope(): Envelope
     {
@@ -34,7 +39,7 @@ class ApplicationReceived extends Mailable
     }
 
     /**
-     * Get the message content definition.
+     * Hier geef ik aan welke Blade-file (markdown) ik wil gebruiken voor de inhoud.
      */
     public function content(): Content
     {

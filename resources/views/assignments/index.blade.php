@@ -13,11 +13,13 @@
         </div>
     </x-slot>
 
+    {{-- 'x-data': Ik gebruik hier Alpine.js voor razendsnelle filtering zonder de pagina te herladen --}}
     <div class="py-12" x-data="{ search: '', type: 'all' }">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             
             @if(Auth::user()->isStudent())
             <!-- Filters voor Studenten -->
+            {{-- x-model: linkt de input direct aan de Alpine.js variabelen 'search' en 'type' --}}
             <div class="bg-white p-6 rounded-lg shadow mb-6 flex space-x-4">
                 <input x-model="search" type="text" placeholder="Zoek op titel of regio..." class="flex-1 border-gray-300 rounded-md">
                 <select x-model="type" class="border-gray-300 rounded-md">
@@ -30,7 +32,9 @@
             @endif
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {{-- @foreach: Ik loop hier door alle opdrachten die ik vanuit de Controller heb meegegeven --}}
                 @foreach($assignments as $assignment)
+                {{-- x-show: Deze magische regel van Alpine.js checkt of een opdracht getoond moet worden op basis van de filters --}}
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 border-l-4 border-indigo-500"
                      x-show="(type === 'all' || '{{ $assignment->type }}' === type) && ('{{ strtolower($assignment->title . ' ' . $assignment->region) }}'.includes(search.toLowerCase()))">
                     <div class="flex justify-between items-start mb-2">
@@ -41,6 +45,7 @@
                     </div>
                     <h3 class="text-xl font-bold mb-2">{{ $assignment->title }}</h3>
                     <p class="text-gray-600 text-sm mb-4 line-clamp-3">
+                        {{-- Laravel helper 'Str::limit' om de tekst netjes in te korten --}}
                         {{ Str::limit($assignment->description, 150) }}
                     </p>
                     
@@ -48,6 +53,7 @@
                         <a href="{{ route('assignments.show', $assignment) }}" class="text-indigo-600 font-semibold hover:underline">
                             Bekijk Details &rarr;
                         </a>
+                        {{-- Security check in de view: alleen de eigenaar krijgt de 'bewerk' knop te zien --}}
                         @if(Auth::id() === $assignment->user_id)
                         <div class="flex space-x-2">
                             <a href="{{ route('assignments.edit', $assignment) }}" class="text-gray-500 hover:text-gray-700">Bewerk</a>

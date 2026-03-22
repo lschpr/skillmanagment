@@ -12,12 +12,15 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     {{-- @if: We gebruiken Blade directives om verschillende content te tonen op basis van de rol --}}
+                    {{-- Dit is mijn manier om de app dynamisch te houden voor studenten en bedrijven --}}
                     
                     @if(Auth::user()->isStudent())
                         <h3 class="text-lg font-bold mb-4">Welkom Student, {{ Auth::user()->name }}!</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            {{-- Widgets voor statistieken: ik haal hier live data uit de relaties op de User --}}
                             <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-100">
                                 <div class="text-sm text-indigo-600 font-bold uppercase">Mijn Reacties</div>
+                                {{-- .count() voert een SQL COUNT query uit op de applications relatie --}}
                                 <div class="text-2xl font-black">{{ Auth::user()->applications()->count() }}</div>
                                 <a href="{{ route('applications.index') }}" class="text-xs text-indigo-700 hover:underline">Bekijk status &rarr;</a>
                             </div>
@@ -38,10 +41,12 @@
                             </div>
                             <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
                                 <div class="text-sm text-blue-600 font-bold uppercase">Totaal Reacties</div>
+                                {{-- Hier gebruik ik 'whereHas' om reacties te tellen die bij MIJN opdrachten horen --}}
                                 <div class="text-2xl font-black">{{ \App\Models\Application::whereHas('assignment', function($q) { $q->where('user_id', Auth::id()); })->count() }}</div>
                                 <span class="text-xs text-blue-700">Van studenten</span>
                             </div>
                             <div class="bg-green-50 p-4 rounded-lg border border-green-100 flex flex-col justify-center items-center">
+                                {{-- Directe link naar het create-formulier van de AssignmentController --}}
                                 <a href="{{ route('assignments.create') }}" class="w-full text-center py-2 bg-green-600 text-white rounded font-bold hover:bg-green-700 transition">
                                     + Nieuwe Opdracht
                                 </a>
@@ -49,6 +54,7 @@
                         </div>
                         
                     @else
+                        {{-- Voor de admin toon ik een simpele melding en een link naar het panel --}}
                         <h3 class="text-lg font-bold mb-4">Admin Dashboard</h3>
                         <p>Beheer accounts en platform content.</p>
                         <a href="{{ route('admin.index') }}" class="mt-4 inline-block bg-gray-800 text-white px-4 py-2 rounded">Naar Admin Panel</a>
