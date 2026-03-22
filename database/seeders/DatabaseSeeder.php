@@ -13,11 +13,13 @@ use Illuminate\Database\Seeder;
 class DatabaseSeeder extends Seeder
 {
     /**
-     * Hier staat mijn hele rijtje met data die ik wil hebben.
+     * De 'run' methode wordt aangeroepen door 'php artisan db:seed'.
+     * Ik zet hier alle testdata klaar voor mijn platform.
      */
     public function run(): void
     {
         // 1. Mijn eigen admin account aanmaken.
+        // Ik gebruik de 'UserFactory' om snel een account te maken met een vaste rol.
         User::factory()->create([
             'name' => 'Admin User',
             'email' => 'admin@skillmanagment.nl',
@@ -33,13 +35,14 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt('password123'),
         ]);
         
+        // Relatie gebruiken om het profiel direct te koppelen.
         $company->profile()->create([
             'bio' => 'Wij bouwen de toekomst van het internet.',
             'location' => 'Amsterdam',
             'website' => 'https://creativecode.nl',
         ]);
 
-        // Direct 5 opdrachten koppelen aan dit bedrijf.
+        // Direct 5 opdrachten (assignments) koppelen aan dit bedrijf via de factory.
         \App\Models\Assignment::factory(5)->create([
             'user_id' => $company->id,
         ]);
@@ -58,7 +61,8 @@ class DatabaseSeeder extends Seeder
             'location' => 'Utrecht',
         ]);
 
-        // 4. En nog 10 extra willekeurige opdrachten om de boel te vullen.
+        // 4. En nog 10 extra willekeurige opdrachten om de database te vullen.
+        // De 'AssignmentFactory' regelt hier de willekeurige teksten en regio's.
         \App\Models\Assignment::factory(10)->create();
     }
 }

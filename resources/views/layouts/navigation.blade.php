@@ -17,8 +17,15 @@
                     </x-nav-link>
 
                     <x-nav-link :href="route('assignments.index')" :active="request()->routeIs('assignments.*')">
-                        {{ __('Opdrachten') }}
+                        {{ Auth::user()->isCompany() ? __('Opdrachten') : __('Opdrachten') }}
                     </x-nav-link>
+
+
+                    @if(Auth::user()->isStudent())
+                        <x-nav-link :href="route('applications.index')" :active="request()->routeIs('applications.index')">
+                            {{ __('Mijn Reacties') }}
+                        </x-nav-link>
+                    @endif
 
                     <x-nav-link :href="route('messages.index')" :active="request()->routeIs('messages.*')">
                         {{ __('Berichten') }}
@@ -85,9 +92,19 @@
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
 
-            <x-responsive-nav-link :href="route('assignments.index')" :active="request()->routeIs('assignments.*')">
-                {{ __('Opdrachten') }}
+            <x-responsive-nav-link :href="route('assignments.index')" :active="request()->routeIs('assignments.*')" class="flex justify-between items-center">
+                {{ Auth::user()->isCompany() ? __('Mijn Opdrachten') : __('Opdrachten') }}
+                @if(Auth::user()->isCompany())
+                    <a href="{{ route('assignments.create') }}" class="text-indigo-600 font-bold px-4">+</a>
+                @endif
+
             </x-responsive-nav-link>
+
+            @if(Auth::user()->isStudent())
+                <x-responsive-nav-link :href="route('applications.index')" :active="request()->routeIs('applications.index')">
+                    {{ __('Mijn Reacties') }}
+                </x-responsive-nav-link>
+            @endif
 
             <x-responsive-nav-link :href="route('messages.index')" :active="request()->routeIs('messages.*')">
                 {{ __('Berichten') }}

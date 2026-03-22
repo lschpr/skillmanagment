@@ -13,6 +13,10 @@ class Profile extends Model
 {
     use HasFactory;
 
+    /**
+     * 'cv_path' en 'logo_path': Hier sla ik de bestandsnaam op van de geüploade bestanden.
+     * De One-to-One relatie met User wordt hieronder gedefinieerd.
+     */
     protected $fillable = [
         'user_id',
         'bio',
@@ -25,6 +29,7 @@ class Profile extends Model
 
     /**
      * Koppeling terug naar de gebruiker (User) waar dit profiel bij hoort.
+     * Dit is de 'BelongsTo' kant van de One-to-One relatie.
      */
     public function user()
     {

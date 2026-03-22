@@ -13,7 +13,8 @@ class Assignment extends Model
     use HasFactory;
 
     /**
-     * Ik heb hier velden voor de titel, omschrijving en regio van de opdracht.
+     * De 'fillable' array bepaalt welke velden ik via een formulier mag vullen.
+     * Dit beschermt mijn database tegen 'mass assignment' aanvallen.
      */
     protected $fillable = [
         'user_id',
@@ -26,6 +27,7 @@ class Assignment extends Model
 
     /**
      * Het bedrijf dat deze opdracht heeft geplaatst.
+     * Dit is een 'BelongsTo' relatie omdat de 'user_id' in deze tabel staat.
      */
     public function company()
     {
@@ -34,6 +36,7 @@ class Assignment extends Model
 
     /**
      * Hier haal ik alle studenten op die op deze opdracht hebben gereageerd.
+     * Dit is een 'HasMany' relatie: één opdracht kan veel reacties hebben.
      */
     public function applications()
     {

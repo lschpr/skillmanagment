@@ -15,24 +15,44 @@ use Illuminate\View\View;
 class ProfileController extends Controller
 {
     /**
-     * Mijn gegevens bijwerken.
+     * Toon het formulier om je eigen profiel aan te passen.
+     * Dit is onderdeel van de standaard Laravel Breeze functionaliteit.
+     */
+    public function edit(Request $request): View
+    {
+        return view('profile.edit', [
+            'user' => $request->user(),
+        ]);
+    }
+
+    /**
+     * Publiek profiel bekijken (bijv. van een bedrijf door een student).
+     * Ik gebruik de User om alle gekoppelde info (zoals opdrachten) te tonen.
+     */
+    public function show(User $user)
+    {
+        return view('profile.show', compact('user'));
+    }
+
+    /**
+     * Mijn gegevens bijwerken in zowel de 'users' als 'profiles' tabel.
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
         $user = $request->user();
         
-        // De basisgegevens (naam en email) in de users tabel vullen.
+        // 'fill': ik vul de user-velden met de gevalideerde data.
         $user->fill($request->validated());
 
-        // Als ik mijn email verander, moet ik hem daarna weer even opnieuw bevestigen.
+        // E-mail check: als ik mijn e-mail verander, moet ik hem opnieuw verifiëren.
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;
         }
 
         $user->save();
 
-        // Mijn extra profielgegevens (zoals bio en skills) opslaan in de profiles tabel.
-        // Ik gebruik updateOrCreate zodat ik niet eerst hoef te checken of het profiel al bestaat.
+        // Profiel-info: ik gebruik 'updateOrCreate' om de extra velden (bio, skills) op te slaan.
+        // Als het profiel nog niet bestaat, wordt het hier direct aangemaakt.
         $user->profile()->updateOrCreate(
             ['user_id' => $user->id],
             $request->only(['bio', 'skills', 'location', 'website'])
@@ -42,23 +62,24 @@ class ProfileController extends Controller
     }
 
     /**
-     * Mijn account helemaal verwijderen.
+     * Mijn account verwijderen.
+     * Dit is een gevoelige actie, dus ik check eerst of het wachtwoord klopt.
      */
     public function destroy(Request $request): RedirectResponse
     {
-        // Ik moet hier even mijn huidige wachtwoord invullen om te bewijzen dat ik het echt ben.
+        // Validatie met een 'error bag' specifiek voor het verwijderen van een user.
         $request->validateWithBag('userDeletion', [
             'password' => ['required', 'current_password'],
         ]);
 
         $user = $request->user();
 
-        // Eerst uitloggen en dan pas deleten.
+        // Uitloggen om de sessie te verbreken en daarna de user uit de database halen.
         Auth::logout();
 
         $user->delete();
 
-        // Mijn sessie en token even helemaal resetten voor de veiligheid.
+        // Sessie vernietigen voor de veiligheid.
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 

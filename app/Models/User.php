@@ -4,18 +4,10 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password', 'role', 'status'])]
-#[Hidden(['password', 'remember_token'])]
-/**
- * Dit is mijn User model. 
- * Ik gebruik 'Authenticatable' zodat Laravel dit model snapt voor het inloggen.
- */
 class User extends Authenticatable
 {
     /** 
@@ -23,6 +15,25 @@ class User extends Authenticatable
      * Notifiable: Hiermee kan ik mailtjes en meldingen sturen naar de gebruiker.
      */
     use HasFactory, Notifiable;
+
+    /**
+     * Standaard Laravel velden die 'ge-mass-assigned' mogen worden.
+     */
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'role',
+        'status',
+    ];
+
+    /**
+     * Velden die verborgen moeten blijven in JSON-output.
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
 
     /**
      * Hier geef ik aan hoe velden in de database omgezet moeten worden.
@@ -37,7 +48,8 @@ class User extends Authenticatable
     }
 
     /**
-     * Een gebruiker heeft bij mij altijd één profiel met extra info (bio, skills, etc).
+     * Een gebruiker heeft bij mij altijd één profiel met extra info (bio, skills, website).
+     * Dit is een One-to-One relatie: Profile::class.
      */
     public function profile()
     {
@@ -46,6 +58,7 @@ class User extends Authenticatable
 
     /**
      * Als de gebruiker een bedrijf is, dan kan hij meerdere opdrachten (assignments) hebben geplaatst.
+     * Dit is een One-to-Many relatie: Assignment::class.
      */
     public function assignments()
     {
@@ -54,6 +67,7 @@ class User extends Authenticatable
 
     /**
      * Een student kan op verschillende opdrachten solliciteren (applications).
+     * Ook dit is een One-to-Many relatie: Application::class.
      */
     public function applications()
     {
@@ -61,7 +75,9 @@ class User extends Authenticatable
     }
 
     /**
-     * Kleine helpers die ik heb gemaakt om snel de rol te checken in mijn code.
+     * Deze kleine helpers heb ik gemaakt om in mijn code (zoals Controllers en Views) 
+     * heel snel te kunnen checken welke rol de ingelogde gebruiker heeft.
+     * Dit houdt mijn code leesbaar: Auth::user()->isCompany().
      */
     public function isAdmin()
     {

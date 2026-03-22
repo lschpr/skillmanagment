@@ -16,7 +16,7 @@
                         <span class="ml-4 text-gray-500"><i class="fas fa-map-marker-alt"></i> {{ $assignment->region }}</span>
                     </div>
                     <div class="text-sm text-gray-500">
-                        Geplaatst door: <strong>{{ $assignment->company->name }}</strong>
+                        Geplaatst door: <a href="{{ route('profile.show', $assignment->company) }}" class="text-indigo-600 font-bold hover:underline">{{ $assignment->company->name }}</a>
                     </div>
                 </div>
 
@@ -62,7 +62,7 @@
                             @foreach($assignment->applications as $application)
                                 <div class="border p-4 rounded-md bg-white hover:bg-gray-50 transition">
                                     <div class="flex justify-between mb-2">
-                                        <span class="font-bold">{{ $application->student->name }}</span>
+                                        <a href="{{ route('profile.show', $application->student) }}" class="font-bold text-indigo-600 hover:underline">{{ $application->student->name }}</a>
                                         <span class="text-xs text-gray-500">{{ $application->created_at->diffForHumans() }}</span>
                                     </div>
                                     <p class="text-sm text-gray-600 mb-3 italic">"{{ $application->message }}"</p>
@@ -79,6 +79,7 @@
                                             <input type="hidden" name="status" value="rejected">
                                             <button type="submit" class="text-xs bg-red-400 text-white px-2 py-1 rounded hover:bg-red-500">Afwijzen</button>
                                         </form>
+                                        <a href="{{ route('messages.show', $application->student) }}" class="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded hover:bg-indigo-200 ml-auto">Bericht sturen</a>
                                     </div>
                                 </div>
                             @endforeach

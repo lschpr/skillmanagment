@@ -14,15 +14,16 @@ return new class extends Migration
         Schema::create('assignments', function (Blueprint $table) {
             $table->id();
             
-            // Koppeling naar de user (het bedrijf). 
-            // Cascade zorgt dat als het bedrijf weg gaat, de opdrachten ook verdwijnen.
+            // Foreign Key naar 'users' tabel.
+            // 'constrained()': Laravel snapt automatisch dat dit bij de 'users' tabel hoort.
+            // 'onDelete(cascade)': Zorgt dat opdrachten ook weg zijn als een bedrijf zich verwijdert.
             $table->foreignId('user_id')->constrained()->onDelete('cascade'); 
             
             $table->string('title');
-            $table->text('description');
-            $table->string('type'); // Bijv. stage of freelance.
+            $table->text('description'); // 'text' gebruik ik voor langere stukken tekst.
+            $table->string('type'); // Hier sla ik op of het een stage, afstuderen of freelance is.
             $table->string('region');
-            $table->string('status')->default('open'); // Standaard staat een opdracht op 'open'.
+            $table->string('status')->default('open'); // Standaardwaarde is 'open' (vacature staat open).
             
             $table->timestamps();
         });

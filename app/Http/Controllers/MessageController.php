@@ -16,19 +16,21 @@ class MessageController extends Controller
 {
     /**
      * Overzicht van al mijn gesprekken.
+     * Ik haal hier alle berichten op waar ik bij betrokken ben, als zender of ontvanger.
      */
     public function index()
     {
         $user = Auth::user();
         
-        // Ik haal hier alle berichten op waar ik zelf bij betrokken ben.
+        // Met 'orWhere' zorg ik dat ik zowel verzonden als ontvangen berichten zie.
         $messages = Message::where('sender_id', $user->id)
             ->orWhere('receiver_id', $user->id)
             ->with(['sender', 'receiver'])
             ->latest()
             ->get();
 
-        // En die groepeer ik dan per persoon, zodat het overzichtelijk blijft.
+        // Groeperen: ik wil niet een lijst met losse berichten, maar gesprekken per persoon.
+        // Deze collectie-methode regelt dat ik per unieke gesprekspartner een groepje krijg.
         $conversations = $messages->groupBy(function($message) use ($user) {
             return $message->sender_id == $user->id ? $message->receiver_id : $message->sender_id;
         });
@@ -41,14 +43,14 @@ class MessageController extends Controller
      */
     public function show(User $user)
     {
-        // Berichten ophalen die tussen mij en de andere user zijn verstuurd.
+        // Ik gebruik hier een 'nested' query om precies de berichten tussen mij en de ander op te halen.
         $messages = Message::where(function($q) use ($user) {
             $q->where('sender_id', Auth::id())->where('receiver_id', $user->id);
         })->orWhere(function($q) use ($user) {
-            $q->where('sender_id', $user->id())->where('receiver_id', Auth::id());
+            $q->where('sender_id', $user->id)->where('receiver_id', Auth::id());
         })->orderBy('created_at', 'asc')->get();
 
-        // Als ik het gesprek open, markeer ik alle ongelezen berichten direct als 'gelezen'.
+        // Markeer als gelezen: als ik het gesprek open, markeer ik alle ongelezen berichten van de ander als gelezen.
         Message::where('sender_id', $user->id)
             ->where('receiver_id', Auth::id())
             ->whereNull('read_at')
@@ -58,11 +60,11 @@ class MessageController extends Controller
     }
 
     /**
-     * Een nieuw berichtje sturen.
+     * Een nieuw berichtje sturen naar iemand.
      */
     public function store(Request $request)
     {
-        // Validatie: ik moet wel een ontvanger hebben en de tekst mag niet leeg zijn.
+        // Validatie: ik check of de ontvanger bestaat en of het bericht niet leeg is.
         $request->validate([
             'receiver_id' => 'required|exists:users,id',
             'content' => 'required|string|max:1000',
@@ -74,7 +76,7 @@ class MessageController extends Controller
             'content' => $request->content,
         ]);
 
-        // Ik stuur ook gelijk een mailtje naar de ontvanger om te laten weten dat er een bericht is.
+        // E-mailnotificatie: de ontvanger krijgt een seintje in zijn inbox.
         Mail::to($msg->receiver->email)->send(new NewMessageReceived($msg));
 
         return back()->with('success', 'Je bericht is verzonden!');

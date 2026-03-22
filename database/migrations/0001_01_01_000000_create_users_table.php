@@ -12,24 +12,25 @@ return new class extends Migration
 {
     /**
      * De 'up' methode bouwt de tabellen in mijn database.
+     * Ik gebruik het 'Blueprint' object om de kolommen te definiëren.
      */
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->id();
+            $table->id(); // Maakt een uniek ID (Primary Key) voor elke gebruiker.
             $table->string('name');
-            $table->string('email')->unique(); // Email moet uniek zijn voor het inloggen.
+            $table->string('email')->unique(); // 'unique' zorgt dat niemand met dezelfde email kan registreren.
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             
-            // Ik heb hier rollen toegevoegd voor studenten, bedrijven en de admin.
+            // Kolom voor rollen: ik gebruik 'student' als standaardwaarde.
             $table->string('role')->default('student'); 
             
-            // Status om te kijken of de admin iemand geblokkeerd heeft.
+            // Hier kan de admin later gebruikers mee blokkeren.
             $table->string('status')->default('active'); 
             
-            $table->rememberToken();
-            $table->timestamps(); // Dit maakt 'created_at' en 'updated_at' aan.
+            $table->rememberToken(); // Voor de 'onthou mij' functie bij het inloggen.
+            $table->timestamps(); // Maakt automatisch 'created_at' en 'updated_at' kolommen.
         });
 
         // Standaard Laravel tabellen voor password reset en sessies.

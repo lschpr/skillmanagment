@@ -13,17 +13,21 @@ class Application extends Model
     use HasFactory;
 
     /**
-     * Deze velden mogen 'ge-mass-assigned' worden (handig bij het opslaan vanuit een formulier).
+     * 'assignment_id': Voor het koppelen aan de opdracht (Foreign Key).
+     * 'user_id': Voor het koppelen aan de student (Foreign Key).
+     * 'status': Kan 'pending', 'accepted' of 'rejected' zijn.
      */
     protected $fillable = [
         'assignment_id',
         'user_id',
         'message',
-        'status', // Hier sla ik op of het geaccepteerd of afgewezen is.
+        'status', 
     ];
 
     /**
      * De student die gereageerd heeft op de opdracht.
+     * Ik gebruik de tweede parameter 'user_id' omdat mijn kolomnaam in de tabel 
+     * niet 'user_id' maar 'student_id' had kunnen zijn, maar hier is het 'user_id'.
      */
     public function student()
     {
@@ -32,6 +36,7 @@ class Application extends Model
 
     /**
      * De opdracht waar de student op heeft gereageerd.
+     * Dit is de tegenhanger van de 'applications' relatie in het Assignment model.
      */
     public function assignment()
     {

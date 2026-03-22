@@ -15,28 +15,43 @@
                     
                     @if(Auth::user()->isStudent())
                         <h3 class="text-lg font-bold mb-4">Welkom Student, {{ Auth::user()->name }}!</h3>
-                        <p class="mb-4">Bekijk de nieuwste opdrachten en reageer direct.</p>
-                        {{-- route(): Genereert automatisch de juiste URL op basis van de naam in web.php --}}
-                        <a href="{{ route('assignments.index') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                            Bekijk Opdrachten
-                        </a>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-100">
+                                <div class="text-sm text-indigo-600 font-bold uppercase">Mijn Reacties</div>
+                                <div class="text-2xl font-black">{{ Auth::user()->applications()->count() }}</div>
+                                <a href="{{ route('applications.index') }}" class="text-xs text-indigo-700 hover:underline">Bekijk status &rarr;</a>
+                            </div>
+                            <div class="bg-green-50 p-4 rounded-lg border border-green-100">
+                                <div class="text-sm text-green-600 font-bold uppercase">Openstaande Opdrachten</div>
+                                <div class="text-2xl font-black">{{ \App\Models\Assignment::where('status', 'open')->count() }}</div>
+                                <a href="{{ route('assignments.index') }}" class="text-xs text-green-700 hover:underline">Zoek opdrachten &rarr;</a>
+                            </div>
+                        </div>
                         
                     @elseif(Auth::user()->isCompany())
                         <h3 class="text-lg font-bold mb-4">Welkom bij Skillmanagment, {{ Auth::user()->name }}!</h3>
-                        <p class="mb-4">Beheer uw opdrachten en bekijk reacties van studenten.</p>
-                        <div class="flex space-x-4">
-                            <a href="{{ route('assignments.index') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                                Mijn Opdrachten
-                            </a>
-                            <a href="{{ route('assignments.create') }}" class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 focus:bg-green-700 active:bg-green-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                                Nieuwe Opdracht Plaatsen
-                            </a>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                            <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-100">
+                                <div class="text-sm text-indigo-600 font-bold uppercase">Mijn Opdrachten</div>
+                                <div class="text-2xl font-black">{{ Auth::user()->assignments()->count() }}</div>
+                                <a href="{{ route('assignments.index') }}" class="text-xs text-indigo-700 hover:underline">Beheer &rarr;</a>
+                            </div>
+                            <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                                <div class="text-sm text-blue-600 font-bold uppercase">Totaal Reacties</div>
+                                <div class="text-2xl font-black">{{ \App\Models\Application::whereHas('assignment', function($q) { $q->where('user_id', Auth::id()); })->count() }}</div>
+                                <span class="text-xs text-blue-700">Van studenten</span>
+                            </div>
+                            <div class="bg-green-50 p-4 rounded-lg border border-green-100 flex flex-col justify-center items-center">
+                                <a href="{{ route('assignments.create') }}" class="w-full text-center py-2 bg-green-600 text-white rounded font-bold hover:bg-green-700 transition">
+                                    + Nieuwe Opdracht
+                                </a>
+                            </div>
                         </div>
                         
                     @else
-                        {{-- Dit wordt getoond als de gebruiker een 'admin' rol heeft --}}
                         <h3 class="text-lg font-bold mb-4">Admin Dashboard</h3>
                         <p>Beheer accounts en platform content.</p>
+                        <a href="{{ route('admin.index') }}" class="mt-4 inline-block bg-gray-800 text-white px-4 py-2 rounded">Naar Admin Panel</a>
                     @endif
                 </div>
             </div>

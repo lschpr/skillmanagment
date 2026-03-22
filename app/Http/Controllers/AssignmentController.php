@@ -13,16 +13,19 @@ class AssignmentController extends Controller
 {
     /**
      * Overzichtspagina voor opdrachten.
+     * Ik haal hier de data op uit de database (Model) en stuur het naar de Blade-view.
      */
     public function index()
     {
         $user = Auth::user();
 
         if ($user->isCompany()) {
-            // Als je een bedrijf bent, laat ik alleen je eigen geplaatste opdrachten zien.
+            // Als je een bedrijf bent, haal ik alleen de opdrachten op met jouw id.
+            // Dit is handig zodat je direct je eigen werk ziet.
             $assignments = $user->assignments()->latest()->get();
         } else {
-            // Studenten zien alle opdrachten die nog op 'open' staan.
+            // Studenten zien alle opdrachten die de status 'open' hebben.
+            // 'latest()' zorgt dat de nieuwste bovenaan staan.
             $assignments = Assignment::where('status', 'open')->latest()->get();
         }
 
@@ -31,6 +34,7 @@ class AssignmentController extends Controller
 
     /**
      * Formulier om een nieuwe opdracht online te zetten.
+     * Ik check eerst of je wel een bedrijf bent (abort 403 als dat niet zo is).
      */
     public function create()
     {
@@ -42,7 +46,7 @@ class AssignmentController extends Controller
     }
 
     /**
-     * Nieuwe opdracht opslaan nadat ik de input heb gecheckt.
+     * De opdracht daadwerkelijk in de database zetten.
      */
     public function store(Request $request)
     {
@@ -50,7 +54,8 @@ class AssignmentController extends Controller
             abort(403);
         }
 
-        // Checken of de titel, omschrijving enzo wel kloppen.
+        // Validatie: ik controleer hier of de gebruiker alles goed heeft ingevuld.
+        // Als dit faalt, gaat Laravel automatisch terug naar het formulier met foutmeldingen.
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
@@ -58,14 +63,16 @@ class AssignmentController extends Controller
             'region' => 'required|string|max:255',
         ]);
 
-        // De nieuwe opdracht koppelen aan de ingelogde user.
+        // Ik gebruik de relatie op de User om de opdracht direct te koppelen aan de ingelogde gebruiker.
         Auth::user()->assignments()->create($validated);
 
+        // Terugsturen naar het overzicht met een succesmelding (flash session).
         return redirect()->route('assignments.index')->with('success', 'Je opdracht staat online!');
     }
 
     /**
-     * Detailpagina van een specifieke opdracht bekijken.
+     * Toon de detailpagina van een opdracht.
+     * Laravel doet hier aan 'Route Model Binding': het zoekt automatisch de Assignment met het ID uit de URL.
      */
     public function show(Assignment $assignment)
     {
@@ -73,11 +80,11 @@ class AssignmentController extends Controller
     }
 
     /**
-     * Formulier om een opdracht aan te passen.
+     * Formulier voor het bewerken van een opdracht.
      */
     public function edit(Assignment $assignment)
     {
-        // Ik check hier of je wel echt de eigenaar bent van de opdracht.
+        // Veiligheidscheck: alleen de eigenaar mag zijn eigen opdracht bewerken.
         if (Auth::id() !== $assignment->user_id) {
             abort(403, 'Niet jouw opdracht, dus afblijven!');
         }
@@ -86,7 +93,7 @@ class AssignmentController extends Controller
     }
 
     /**
-     * Wijzigingen opslaan in de database.
+     * De wijzigingen opslaan in de database.
      */
     public function update(Request $request, Assignment $assignment)
     {
@@ -108,7 +115,7 @@ class AssignmentController extends Controller
     }
 
     /**
-     * Een opdracht helemaal verwijderen.
+     * De opdracht verwijderen uit de database.
      */
     public function destroy(Assignment $assignment)
     {
